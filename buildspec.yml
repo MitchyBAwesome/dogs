@@ -20,5 +20,5 @@ phases:
       - docker push "$(cat /tmp/build_tag.out)"
 artifacts:
   files:
-    - /tmp/build.json
+    - imagedefinitions.json
   discard-paths: yes
