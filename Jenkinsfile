@@ -7,7 +7,7 @@ node {
    docker.build('dogs')
 
    stage 'build awscli container'
-   sh 'docker build -f /buildresources/AWSCLI -t awscli .'
+   sh 'docker build -f ./buildresources/AWSCLI -t awscli .'
 
    stage 'Push to ECR'
    sh ("eval \$(docker run awscli aws ecr get-login --region ${REGION} --no-include-email | sed 's|https://||')")
