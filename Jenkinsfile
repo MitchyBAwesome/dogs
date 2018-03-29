@@ -1,18 +1,44 @@
-pipeline {
- def customImage = docker.build("my-image:${env.BUILD_ID}")
- agent {
-   docker { label 'docker'}
- }
- stages {
-  stage('Build') {
-   steps {
-    sh "docker build -t mitchybgood/dogs:${GIT_SHA} ."
-  }
- }
- stage('Publish') {
-   steps {
-     sh "docker push mitchybgood/dogs:${GIT_SHA}"
+node {
+
+   stage 'Checkout'
+   git 'https://github.com/MitchyBAwesome/dogs.git'
+
+   stage 'Build Dockerfile'
+   docker.build('hello')
+
+   stage 'Push to ECR'
+   sh ("eval \$(docker run awscli aws ecr get-login --region ${REGION} --no-include-email | sed 's|https://||')")
+   docker.withRegistry('https://${ECR_REPO}') {
+       docker.image('hello').push('${BUILD_NUMBER}')
    }
- }
-}
+
+/**   stage 'update application'
+
+   parallel(
+        ecs: {node {
+        docker.image('awscli').inside{
+            git 'https://github.com/omarlari/aws-container-sample-app.git'
+            sh 'sed -i s/REPO/${ECR_REPO}/g task-definition-hello.json'
+            sh 'sed -i s/BUILD/${BUILD_NUMBER}/g task-definition-hello.json'
+            sh 'aws ecs register-task-definition --cli-input-json file://task-definition-hello.json --family ${APP} --region ${REGION}'
+        }
+        }},
+        kubernetes: { node {
+        docker.image('kubectl').inside("--volume=/home/ec2-user/.kube:/config/.kube"){
+            sh 'kubectl describe deployment ${APP}'
+            sh 'kubectl set image deployment/${APP} movies=${ECR_REPO}/hello:${BUILD_NUMBER}'
+            sh 'kubectl describe deployment ${APP}'
+            }
+        }},
+        swarm: { node {
+            sh "echo deploying to swarm"
+        }}
+   )
+
+
+   stage 'update ECS service'
+   docker.image('awscli').inside{
+       sh 'aws ecs update-service --cluster ${ECS_CLUSTER} --service ${APP} --task-definition ${APP} --region ${REGION}'
+   }
+**/
 }
