@@ -6,10 +6,10 @@ RUN mkdir -p /aws && \
 	pip install awscli && \
 	apk --purge -v del py-pip && \
 	rm /var/cache/apk/*
-RUN adduser -D -u 1000 -g 'www' www   
+RUN adduser -D -u 1000 -g 'www' www
 RUN mkdir /www && \
     chown -R www:www /www
 COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./index.html /www/index.html
-RUN aws --region us-west-2 s3 cp s3://catsndogs-assets/dogs-images /www/ --recursive
+#RUN aws --region us-west-2 s3 cp s3://catsndogs-assets/dogs-images /www/ --recursive
 CMD nginx -g "daemon off;"
