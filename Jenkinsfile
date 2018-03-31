@@ -6,13 +6,13 @@ node {
    stage 'Build Dockerfile'
    docker.build('dogs')
 
-   stage 'build awscli container'
+   stage 'Build AWSCLI Container'
    sh 'docker build -f ./buildresources/AWSCLI -t awscli .'
 
    stage 'Push to ECR'
    //sh "docker run -v \${HOME_PATH}/.aws:/root/.aws awscli "
    sh ("eval \$(docker run -v \${HOME_PATH}/.aws:/root/.aws awscli aws ecr get-login --region ${REGION} --no-include-email | sed 's|https://||')")
-   docker.withRegistry('https://${ECR_REPO}','ecr:us-east-1:ecr-credentials') {
+   docker.withRegistry('https://${ECR_REPO}') {
        docker.image('dogs').push('${BUILD_NUMBER}')
    }
 
