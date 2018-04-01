@@ -9,6 +9,9 @@ node {
    stage 'Build AWSCLI Container'
    sh 'docker build -f ./buildresources/AWSCLI -t awscli .'
 
+   stage 'Build Klar Container'
+   sh 'docker build -f ./buildresources/klar/Dockerfile -t klar:latest .'
+
    stage 'Push to ECR'
    //sh "docker run -v \${HOME_PATH}/.aws:/root/.aws awscli "
    sh ("eval \$(docker run -v \${HOME_PATH}/.aws:/root/.aws awscli aws ecr get-login --region ${REGION} --no-include-email | sed 's|https://||')")
@@ -18,12 +21,7 @@ node {
 
    stage 'Scan Pushed Image for Vulnerabilites'
    docker.image('klar:latest').inside{
-     sh CLAIR_ADDR='http://localhost'
-     sh CLAIR_OUTPUT=High
-     sh CLAIR_THRESHOLD=10
-     sh DOCKER_USER='aws'
-     sh DOCKER_PASSWORD='secret'
-     sh klar
+     sh ''
    }
    /** sh DOCKER_USER=AWS DOCKER_PASSWORD=${PASSWORD} ./klar 710487389845.dkr.ecr.us-east-1.amazonaws.com/dogs:26
 
