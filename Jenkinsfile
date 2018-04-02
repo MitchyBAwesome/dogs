@@ -19,10 +19,17 @@ node {
        docker.image('dogs').push('${BUILD_NUMBER}')
    }
 
+   stage 'Construct Klar Environment File'
+   sh 'DOCKER_LOGIN=$(docker run -v \${HOME_PATH}/.aws:/root/.aws awscli aws ecr get-login --region ${REGION} --no-include-email'
+   sh 'PASSWORD=`echo $DOCKER_LOGIN | cut -d' ' -f6`'
+   sh 'REGISTRY=`echo $DOCKER_LOGIN | cut -d' ' -f7'
+   sh 'echo $REGISTRY'
+   sh 'echo $PASSWORD'
+
    stage 'Scan Pushed Image for Vulnerabilites'
    docker.image('klar:latest').inside {
      stage("Testing Pushed Image") {
-       sh "/bin/sh -c /klar \${ECR_REPO}:\${BUILD_NUMBER}"
+       sh '/bin/sh -c "/klar \${ECR_REPO}:\${BUILD_NUMBER}"'
      }
    }
    /** sh DOCKER_USER=AWS DOCKER_PASSWORD=${PASSWORD} ./klar 710487389845.dkr.ecr.us-east-1.amazonaws.com/dogs:26
