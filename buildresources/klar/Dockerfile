@@ -1,3 +1,12 @@
-FROM golang:1.10-alpine3.7
-RUN wget https://github.com/optiopay/klar/releases/download/v2.0.2/klar-2.0.2-linux-amd64 -O /klar
-RUN chmod +x /klar
+FROM golang:1.8-alpine as builder
+
+RUN apk --update add git;
+RUN go get -d github.com/optiopay/klar
+RUN go build ./src/github.com/optiopay/klar
+
+FROM alpine:3.6
+
+RUN apk add --no-cache ca-certificates
+COPY --from=builder /go/klar /klar
+
+ENTRYPOINT ["/klar"]
