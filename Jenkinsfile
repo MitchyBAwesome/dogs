@@ -20,9 +20,7 @@ node {
    }
 
    stage 'Scan Pushed Image for Vulnerabilites'
-   docker.image('klar:latest').inside{
-     sh ''
-   }
+   docker.image('klar:latest')
    /** sh DOCKER_USER=AWS DOCKER_PASSWORD=${PASSWORD} ./klar 710487389845.dkr.ecr.us-east-1.amazonaws.com/dogs:26
 
 /**   stage 'update application'
