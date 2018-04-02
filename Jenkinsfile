@@ -20,7 +20,7 @@ node {
    }
 
    stage 'Construct Klar Environment File'
-   sh 'DOCKER_LOGIN=$(docker run -v \${HOME_PATH}/.aws:/root/.aws awscli aws ecr get-login --region ${REGION} --no-include-email'
+   sh 'DOCKER_LOGIN=$(docker run -v \${HOME_PATH}/.aws:/root/.aws awscli aws ecr get-login --region ${REGION} --no-include-email)'
    sh 'PASSWORD=`echo $DOCKER_LOGIN | cut -d' ' -f6`'
    sh 'REGISTRY=`echo $DOCKER_LOGIN | cut -d' ' -f7'
    sh 'echo $REGISTRY'
